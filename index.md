@@ -1,14 +1,14 @@
 ---
 layout: report
 url: hemang
-student: Hemang Kumar
+student: Akshat Karani
 organisation: coala
 organisation_link : https://coala.io
-project: Improve coala Website & Supporting Tools
-project_link: https://summerofcode.withgoogle.com/projects/#6012382913495040
+project: Next Generation Action System
+project_link: https://summerofcode.withgoogle.com/projects/#5450946933424128
 tarball: https://github.com/hemangsk/GSoCReport/raw/master/hemangsk_coala.tar
 mentors: >
- [Lasse Schuirmann](https://github.com/sils) & [Fabian Neuschmidt](https://github.com/fneu)
+ [Abhinav Kaushlya](https://github.com/abhishalya) & [Kriti Rohilla](https://github.com/kriti21)
 phase:
  - Bonding : https://gitlab.com/coala/GSoC-2017/milestones/3
  - Phase 1 : https://gitlab.com/coala/GSoC-2017/milestones/7
@@ -19,19 +19,16 @@ bio: >
  Communication & Technology, GGS IP University. I participated in GSoC and worked with [coala](coala.io) to facilitate users to use coala online and functionality for one click Git Repository linting. I also worked on a bot to generate coafile, worked on improving UI of coala-html and configurability of coala-projects. I also worked on adding Notification and Thread support in the IGitt library.  
 social:
  - GitHub:
-   - username: hemangsk
-   - link: https://github.com/hemangsk
+   - username: akshatkarani
+   - link: https://github.com/akshatkarani
  - GitLab:
-   - username: hemangsk
-   - link: https://gitlab.com/hemangsk
+   - username: akshatkarani
+   - link: https://gitlab.com/akshatkarani
  - Gitter:
-   - username: hemangsk
-   - link: https://gitter.im/hemangsk
- - HackerRank:
-   - username: hemangsk
-   - link: https://hackerrank/hemang
-email: hemangsk@gmail.com
-blog: http://hemangsk.github.io/stories.html
+   - username: akshatkarani
+   - link: https://gitter.im/akshatkarani
+email: akshatkarani@gmail.com
+blog: http://akshatkarani.github.io/blog
 activity:
  - 0:
    - repo: coala-quickstart 
@@ -184,7 +181,7 @@ activity:
 
 ---
 
-### Improve coala Website and Supporting Tools
+### Next generation action system
 
 
 #### Work Done
