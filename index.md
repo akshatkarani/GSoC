@@ -10,13 +10,12 @@ tarball: https://github.com/hemangsk/GSoCReport/raw/master/hemangsk_coala.tar
 mentors: >
  [Abhinav Kaushlya](https://github.com/abhishalya) & [Kriti Rohilla](https://github.com/kriti21)
 phase:
- - Bonding : https://gitlab.com/coala/GSoC-2017/milestones/3
- - Phase 1 : https://gitlab.com/coala/GSoC-2017/milestones/7
- - Phase 2 : https://gitlab.com/coala/GSoC-2017/milestones/8
- - Phase 3 : https://gitlab.com/coala/GSoC-2017/milestones/9
+ - Bonding : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/19?title=BONDING_Next_Gen_Action_System
+ - Phase 1 : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/20?title=PHASE_1_Next_Gen_Action_System
+ - Phase 2 : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/21?title=PHASE_2_Next_Gen_Action_System
+ - Phase 3 : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/22?title=PHASE_3_Next_Gen_Action_System
 bio: >
- I'm a final year student of Computer Science & Engineering at University School of Information,
- Communication & Technology, GGS IP University. I participated in GSoC and worked with [coala](coala.io) to facilitate users to use coala online and functionality for one click Git Repository linting. I also worked on a bot to generate coafile, worked on improving UI of coala-html and configurability of coala-projects. I also worked on adding Notification and Thread support in the IGitt library.  
+ I'm a third year student of Computer Science & Engineering at Indian Institute of Technology, Dharwad. I participated in GSoC and worked with [coala](coala.io) to facilitate users to use coala online and functionality for one click Git Repository linting. I also worked on a bot to generate coafile, worked on improving UI of coala-html and configurability of coala-projects. I also worked on adding Notification and Thread support in the IGitt library.  
 social:
  - GitHub:
    - username: akshatkarani
