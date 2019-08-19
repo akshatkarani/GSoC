@@ -116,7 +116,7 @@
                         <tr class="blue-grey-text text-lighten-2">
                             <td></td>
                             <td>Repository</td>
-                            <td>Link</td>
+                            <td>Link to PR</td>
                             <td>Description</td>
                         </tr>
                     </thead>

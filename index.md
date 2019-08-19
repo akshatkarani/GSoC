@@ -38,62 +38,47 @@ activity:
    - repo: cEP
    - link: https://github.com/coala/cEPs/pull/182/
    - details: > 
-      **PR**: cEP for Project
- - 1:
-   - repo: coala
-   - link: https://github.com/coala/coala/issues/6034
-   - details: >
-      **Issue**: Bug in color_letter function in ConsoleInteracion module
+      cEP for Project
  - 1:
    - repo: coala
    - link: https://github.com/coala/coala/pull/6039
    - details: > 
-       **PR**: Fixing color_letter function in ConsoleInteraction module
+       Fixing color_letter function in ConsoleInteraction module
  - 2:
    - repo: coala
    - link: https://github.com/coala/coala/pull/6029
    - details: > 
-      **PR**: Adding actions attribute to Result class
+      Adding actions attribute to Result class
  - 3:
    - repo: coala-bears
    - link: https://github.com/coala/coala-bears/pull/2927
    - details: >
-      **PR**: EditCommitMessageAction and AddNewlineAction for GitCommitBear
+      EditCommitMessageAction and AddNewlineAction for GitCommitBear
  - 4:
    - repo: coala
    - link: https://github.com/coala/coala/pull/6046
    - details: >
-      **PR**: Tutorial for writing bear specific actions
+      Tutorial for writing bear specific actions
  - 5:
    - repo: coala
    - link: https://github.com/coala/coala/pull/6057
    - details: >
-      **PR**: Implementing AlternatePatchAction and support for bears to provide multiple patches
+      Implementing AlternatePatchAction and support for bears to provide multiple patches
  - 6:
-   - repo: coala-bears
-   - link: https://github.com/coala/coala-bears/issues/2945
-   - details: >
-      **Issue**: Applying IgnoreResultAction gives error
- - 7:
    - repo: coala-bears
    - link: https://github.com/coala/coala-bears/pull/2947
    - details: >
-      **PR**: DeleteFileAction for DuplicateFileBear
- - 8:
+      DeleteFileAction for DuplicateFileBear
+ - 7:
    - repo: coala-bears
    - link: https://github.com/coala/coala-bears/pull/2948
    - details: >
-      **PR**: Providing multiple patches for FilenameBear
- - 9:
+      Providing multiple patches for FilenameBear
+ - 8:
    - repo: coala
-   - link: https://github.com/coala/coala/issues/6056
+   - link: https://github.com/coala/coala/pull/6060
    - details: >
-      **Issue**: test_ask_for_actions_and_apply defined twice
- - 10:
-   - repo: coala
-   - link: https://github.com/coala/coala/issues/6036
-   - details: >
-      **Issue**: Unused and double imports
+      Update the docs to explain how bears can suggest multiple patches
  
 ---
 
@@ -130,7 +115,7 @@ shortlog and body of commit message when applied.
 
 - Updated FilenameBear to provide multiple patches wherever it cannot guess the naming convention to use.
 
-- Wrote a tutorial which describes how to write bears which can provide multiple patches.
+- Updated the docs to briefly explain how bears can suggest multiple patches.
 
 ##### Challenges
 
