@@ -1,21 +1,26 @@
 ---
 layout: report
-url: hemang
 student: Akshat Karani
+student_link: https://akshatkarani.github.io
 organisation: coala
 organisation_link : https://coala.io
 project: Next Generation Action System
 project_link: https://summerofcode.withgoogle.com/projects/#5450946933424128
-tarball: https://github.com/hemangsk/GSoCReport/raw/master/hemangsk_coala.tar
+tarball: https://github.com/akshatkarani
 mentors: >
- [Abhinav Kaushlya](https://github.com/abhishalya) & [Kriti Rohilla](https://github.com/kriti21)
+ [Abhinav Kaushlya](https://github.com/abhishalya), [Vamshi Krishna](https://github.com/Vamshi99) & [Kriti Rohilla](https://github.com/kriti21)
 phase:
  - Bonding : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/19?title=BONDING_Next_Gen_Action_System
  - Phase 1 : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/20?title=PHASE_1_Next_Gen_Action_System
  - Phase 2 : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/21?title=PHASE_2_Next_Gen_Action_System
  - Phase 3 : https://gitlab.com/coala/GSoC/gsoc-2019/-/milestones/22?title=PHASE_3_Next_Gen_Action_System
 bio: >
- I'm a third year student of Computer Science & Engineering at Indian Institute of Technology, Dharwad. I participated in GSoC and worked with [coala](coala.io) to facilitate users to use coala online and functionality for one click Git Repository linting. I also worked on a bot to generate coafile, worked on improving UI of coala-html and configurability of coala-projects. I also worked on adding Notification and Thread support in the IGitt library.  
+ I'm a third year student of Computer Science & Engineering at
+ Indian Institute of Technology, Dharwad. I am enthusiatic about
+ contributing to open source and working on my own projects.
+ I participated in GSoC and worked with [coala](https://coala.io) to provide
+ support for bears to define their own custom actions. I also provided support
+ for bears to suggest multiple patches for a problem.
 social:
  - GitHub:
    - username: akshatkarani
@@ -30,196 +35,110 @@ email: akshatkarani@gmail.com
 blog: http://akshatkarani.github.io/blog
 activity:
  - 0:
-   - repo: coala-quickstart 
-   - link: https://github.com/coala/coala-quickstart/commits/master?author=hemangsk
+   - repo: cEP
+   - link: https://github.com/coala/cEPs/pull/182/
    - details: > 
-      Add --allow-incomplete-sections mode and bump coala version.
+      **PR**: cEP for Project
  - 1:
-   - repo: coalaCSS
-   - link: https://github.com/coala/coalaCSS/commits/master?author=hemangsk
+   - repo: coala
+   - link: https://github.com/coala/coala/issues/6034
    - details: >
-      Create a CSS library to have consistency throughout coala web projects.
+      **Issue**: Bug in color_letter function in ConsoleInteracion module
  - 1:
-   - repo: coala Projects
-   - link: https://github.com/coala/projects/commits/master?author=hemangsk
+   - repo: coala
+   - link: https://github.com/coala/coala/pull/6039
    - details: > 
-       Commits **f26ae52** through **6497def** were part of GSoC.
+       **PR**: Fixing color_letter function in ConsoleInteraction module
  - 2:
-   - repo: landing-frontend
-   - link: https://github.com/coala/landing-frontend/commits/master?author=hemangsk
+   - repo: coala
+   - link: https://github.com/coala/coala/pull/6029
    - details: > 
-      Commits  **7e2efb3** through **a48a08a** were part of GSoC.
+      **PR**: Adding actions attribute to Result class
  - 3:
-   - repo: IGitt
-   - link: https://gitlab.com/gitmate/open-source/IGitt/commit/718603aa2294a55206cfaa8806aa624791757ec4
-   - details: Add put method
+   - repo: coala-bears
+   - link: https://github.com/coala/coala-bears/pull/2927
+   - details: >
+      **PR**: EditCommitMessageAction and AddNewlineAction for GitCommitBear
  - 4:
-   - repo: IGitt
-   - link: https://gitlab.com/gitmate/open-source/IGitt/commit/ae503347ff50af5109787257deef340bccdaa476
-   - details: Add eliminate_none method
+   - repo: coala
+   - link: https://github.com/coala/coala/pull/6046
+   - details: >
+      **PR**: Tutorial for writing bear specific actions
  - 5:
-   - repo: IGitt
-   - link: https://gitlab.com/gitmate/open-source/IGitt/commit/66c7d739e15fec9fef6ed0b303d513ce5dbe5fd2
-   - details: Add create_mr, create_file, delete and fork
+   - repo: coala
+   - link: https://github.com/coala/coala/pull/6057
+   - details: >
+      **PR**: Implementing AlternatePatchAction and support for bears to provide multiple patches
  - 6:
-   - repo: IGitt
-   - link: https://gitlab.com/gitmate/open-source/IGitt/commit/a549c0f4f58815bbcb1313836402c04dab65a427
-   - details: Add content support
+   - repo: coala-bears
+   - link: https://github.com/coala/coala-bears/issues/2945
+   - details: >
+      **Issue**: Applying IgnoreResultAction gives error
  - 7:
-   - repo: IGitt
-   - link: https://gitlab.com/gitmate/open-source/IGitt/commit/9df49ee894556a8dea1d735dddadacb6aebd1542
-   - details: Add notification and threads support
+   - repo: coala-bears
+   - link: https://github.com/coala/coala-bears/pull/2947
+   - details: >
+      **PR**: DeleteFileAction for DuplicateFileBear
  - 8:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/d654330d3835d6de7a628f37222b136393eba1fc
-   - details: Add coala_online endpoint
+   - repo: coala-bears
+   - link: https://github.com/coala/coala-bears/pull/2948
+   - details: >
+      **PR**: Providing multiple patches for FilenameBear
  - 9:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/93de4d7bbabd8d831dd19982d50eeb258266e6dd
-   - details: Register coala_online endpoint
+   - repo: coala
+   - link: https://github.com/coala/coala/issues/6056
+   - details: >
+      **Issue**: test_ask_for_actions_and_apply defined twice
  - 10:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/2b58d950983d2bb8c686e0364f5d9abe8d806eae
-   - details: Add coala_online in INSTALLED_APPS
- - 11:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/bf399738d9c38c66315f3d5d4558dd5f15ed0106
-   - details: Use celery task to spawn Docker container
- - 12:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/c4d27e0887a7afb0164ba952b1919186c5b3338c
-   - details: Add coala.io in ALLOWED_HOSTS
- - 13:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/3f325f49a6b8f5a7af3e86f89cd6511e891b3364
-   - details: Use gitmate celery task
- - 14:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/69286e533f2d33215f8d153052dd8df7d5c2bea4
-   - details: Set FORCE_CELERY to True
- - 15:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/861600a07639d6539c57561be090b2c2c8a4f03d
-   - details: Set CELERY_RESULT_BACKEND to amqp
- - 16:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/b0cc1eacbce9e555287ed790dc0e2c8c52eece12
-   - details: Add Rate Limiting and DRF
- - 14:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/69286e533f2d33215f8d153052dd8df7d5c2bea4
-   - details: Set FORCE_CELERY to True
- - 15:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/861600a07639d6539c57561be090b2c2c8a4f03d
-   - details: Set CELERY_RESULT_BACKEND to amqp
- - 16:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/976e7e0e9154179cabe878ec14d68cf6fba67ebc
-   - details: Bump IGitt to latest dev version
- - 17:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/e9cbd7f056c4a25a2406e70f6791f7fada8c4104
-   - details: Add coafile_bot
- - 18:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/4e39ff4e38c6dd3165be717602b58bdb2a794bd7
-   - details: Add GITHUB_BOT_USER
- - 19:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/59562470ac2df18ae7733b7c3ac6cf445813aa64
-   - details: Rename tokens and add default value
- - 20:
-   - repo: GitMate-2
-   - link: https://gitlab.com/gitmate/open-source/gitmate-2/commit/0b410d49b389d219f622e9089f928893e5cccde6
-   - details: Return pull request object on retries
- - 21:
-   - repo: coala-html
-   - link: https://github.com/coala/coala-html/commits/master?author=hemangsk
-   - details: Commits **bb9d9d6** through **6f67174** were part of GSoC
- - 22:
-   - repo: landing
-   - link: https://gitlab.com/coala/landing/commits/master
-   - details: Commits **095f1561** through **a206ef6d** were part of GSoC
- - 23:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/772fbbab828669202bffce6bcdb8ae963c0f0a99
-   - details: Install shallow clone of quickstart
- - 24:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/fff4b49c0960a5545f601b31472ca8b697dd9118
-   - details: Add script to run analysis and quickstart
- - 25:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/ef7b79fb37512d18b2d3a35bc3e55fca09dd2cb8
-   - details: Add utility functions
- - 23:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/1f126253f498eb3c9956c527191d0287cb130533
-   - details: Create README
- - 24:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/c75fcdef105bbce44021db131b59dd5068e021b6
-   - details: Add temp directory for file permissions
- - 25:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/3f11f1282ce859caf13acc6e06e72941c6d0e3a6
-   - details: Run coala
- - 25:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/d50ce7c3161891050ecb3f44fac05fd4a2723454
-   - details: Add read_coafile function
- - 25:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/e0222b799c3a27f1856a50ca72dfe29aee4eb085
-   - details: Keep newline characters in coafile string
- - 25:
-   - repo: coala-online-docker
-   - link: https://gitlab.com/hemangsk/coala-incremental-results/commit/e0222b799c3a27f1856a50ca72dfe29aee4eb085
-   - details: Add coafile in bear mode response
-
+   - repo: coala
+   - link: https://github.com/coala/coala/issues/6036
+   - details: >
+      **Issue**: Unused and double imports
+ 
 ---
 
 ### Next generation action system
 
 
-#### Work Done
+##### Work Done
 
-The coala Online module now has support for all the bears, bears with optional as well as non optional settings, everything can be configured. Users can perform code analysis online with any given bear. The project enhanced coala-html by introducing results and bear search and filtering on basis of parameters. A coafile_bot is created which can be used to generate coala configuration file for any given GitHub repository. One click git repository linting is possible online. A CSS framework was built upon MaterializeCSS for coala web projects [coalaCSS](https://github.com/coala/coalaCSS) and its being used via CDN at webservices.coala.io, projects.coala.io, coala.io, school.coala.io and other coala web projects.
+- Made some changes to `action_dict`, now the key of the dictionary
+is `id` of the object rather that name of the class.
 
-<br>
+- Updated the `color_letter` function in ConsoleInteraction module to display
+the action on console properly.
 
-coala-quickstart has got a new running mode, allow-incomplete-sections which helps users to create a coafile without omitting bears with non optional settings. 
+- I added two new attribute to `Result` class:
 
-<br>
+-- `actions` attribute which is a list of action instances and
+allows bears to define their own actions.
 
-IGitt now supports Notifications and Threads for GitHub and partially for GitLab (Notifications API is not available on GitLab as of now).
+-- `alternate_diffs` attribute which is a list of dictionaries
+where each element is an alternate patch.
 
-<br>
+- Implemented some bears specific actions:
 
-projects.coala.io is now Jekyll based and configurable via a YAML file. It also has a more conflict free approach while simultaneously adding projects.
+-- `EditCommitMessageAction` for `GitCommitBear` which opens an editor
+in which user can edit the commit message.
 
-<br>
+-- `ApplyPatchAction` for `GitCommitBear` which adds a newline between
+shortlog and body of commit message when applied.
 
-coala Online module is live and running [here](https://coala.io/#/coalaonline).
+-- `DeleteFileAction` for `DuplicateFileBear` which deletes one of the duplicate file.
 
-<br>
-coala-html is more powerful with omni search bar and UI enhancements.
+- Wrote a tutorial which describes how to write bear specific actions.
 
-#### Challenges
+- Updated FilenameBear to provide multiple patches wherever it cannot guess the naming convention to use.
 
-It was a great learning experience overall, but a few challenges which proved to be a great enriching experience was working with VCRpy for IGitt tests, Working docker images which can be spawned inside a docker container itself, Visualizing the bear selection user interface on the coala Online module. These were pretty tough challenges and I was able to complete it with research, consistency but most importantly with guidance of my mentors, who were always there for me throughout the GSoC page for which I am really greatful. I learnt a lot from them, and it was an extremely great experience to work under their mentorship.
+- Wrote a tutorial which describes how to write bears which can provide multiple patches.
+
+##### Challenges
+
+It was a great learning experience overall, and I did face a few problems throughout but I was able to tackle/workaround them with help of my mentors. The first problem I faced was allowing bears to define their own actions without affecting the default actions. There were many possible options to implement this and selecting one which would be feasible and works was a difficult task. Also allowing multiple patches without making huge changes in existing framework was challenging. Writing tests for some of the actions implemented which involved deleting a file or amending commit messages was tricky.
 
 
-#### Work to be done
+##### Work to be done
 
-The first task, is to get all the supporting tools like coala Online, coala-html and projects.coala.io need to incooperate user feedback on the changes user experience. 
-
-<br>
-
-coafile_bot will be able to do wonders on GitLab as well once GitLab introduces Notification API. Initally I want to promote it as much as I can so that developers can have general awareness about linting, the tools available and how coala comes into the picture, and from there they can use coafile bot and then ultimately improve their git workflow. 
-
-<br>
-Essentially the projects.coala.io page can be used for a particular program like GSoC, GCI and also for general project management of an organization. Now some organization may want more flexibility on a particular feature. Depending on what more coala needs for project management, and depending upon consensus of other organization voting on a new feature, there is a great room for improvement in projects.coala.io
-
-<br>
+Main advantage after this project is that now many useful custom actions can be implemented for bears. Identifying where custom actions can be useful and implementing them will be a .
+Another thing which can be done is extending some of the existing bears to provide multiple patches.
+Also allowing actions to be initialized with custom descriptions would be really helpful.

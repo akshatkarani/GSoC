@@ -29,7 +29,7 @@
                     <div class="card flex1">
                         <div class="card-content">
                             <h5 class="light no-margin"><a href="{{page.organisation_link}}">{{ page.organisation }}</a></h5>
-                            <h3 class="light">{{ page.student }}</h3>
+                            <h3 class="light"><a href="{{page.student_link}}">{{ page.student }}</a></h3>
                             <p>{{page.bio | markdownify}}</p>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                         <tr class="blue-grey-text text-lighten-2">
                             <td></td>
                             <td>Repository</td>
-                            <td>Link to Commit/s</td>
+                            <td>Link</td>
                             <td>Description</td>
                         </tr>
                     </thead>
