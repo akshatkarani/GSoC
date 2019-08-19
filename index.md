@@ -6,7 +6,7 @@ organisation: coala
 organisation_link : https://coala.io
 project: Next Generation Action System
 project_link: https://summerofcode.withgoogle.com/projects/#5450946933424128
-tarball: https://github.com/akshatkarani
+tarball: https://github.com/akshatkarani/GSoC/raw/master/akshatkarani.tar.gz
 mentors: >
  [Abhinav Kaushlya](https://github.com/abhishalya), [Vamshi Krishna](https://github.com/Vamshi99) & [Kriti Rohilla](https://github.com/kriti21)
 phase:
@@ -38,7 +38,7 @@ activity:
    - repo: cEP
    - link: https://github.com/coala/cEPs/pull/182/
    - details: > 
-      cEP for Project
+      cEP for the Project
  - 1:
    - repo: coala
    - link: https://github.com/coala/coala/pull/6039
@@ -106,7 +106,7 @@ where each element is an alternate patch.
 -- `EditCommitMessageAction` for `GitCommitBear` which opens an editor
 in which user can edit the commit message.
 
--- `ApplyPatchAction` for `GitCommitBear` which adds a newline between
+-- `AddNewlineAction` for `GitCommitBear` which adds a newline between
 shortlog and body of commit message when applied.
 
 -- `DeleteFileAction` for `DuplicateFileBear` which deletes one of the duplicate file.
@@ -124,6 +124,13 @@ It was a great learning experience overall, and I did face a few problems throug
 
 ##### Work to be done
 
-Main advantage after this project is that now many useful custom actions can be implemented for bears. Identifying where custom actions can be useful and implementing them will be a community driven process.
-Another thing which can be done is extending some of the existing bears to provide multiple patches.
-Also allowing actions to be initialized with custom descriptions would be really helpful because currently actions particularly AlternatePatchActions are displayed as `Show AlternatePatch` and a feature like above will display that actions specific descriptions which would be helpful to the user.
+Main advantage after this project is that now many useful custom actions can
+be implemented for bears. Identifying where custom actions can be useful
+and implementing them will be a community driven process.
+Another thing which can be done is extending some of the existing bears to
+provide multiple patches.
+Also allowing actions to be initialized with a custom description would be
+really helpful. Currently actions have a default description  and a with
+feature like above it will be possible to display an action specific description
+which would be helpful to the user particularly incase of AlternatePatchAction,
+which is currently displayed as `Show AlternatePatch`.

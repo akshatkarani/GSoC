@@ -1,0 +1,98 @@
+From 74c83e0a20ad6ac18257929aebc6cdd9471e140b Mon Sep 17 00:00:00 2001
+From: akshatkarani <akshatkarani@gmail.com>
+Date: Fri, 9 Aug 2019 19:47:14 +0530
+Subject: [PATCH] DeleteFileAction: New action for DuplicateFileBear
+
+Added a new action DeleteFileAction for DuplicateFileBear. Two instances
+of this action are added corresponding to the files. On applying it will
+delete one the file.
+---
+ bears/general/actions/DeleteFileAction.py     | 26 ++++++++++++++
+ bears/general/actions/__init__.py             |  0
+ tests/general/actions/DeleteFileActionTest.py | 35 +++++++++++++++++++
+ tests/general/actions/__init__.py             |  0
+ 4 files changed, 61 insertions(+)
+ create mode 100644 bears/general/actions/DeleteFileAction.py
+ create mode 100644 bears/general/actions/__init__.py
+ create mode 100644 tests/general/actions/DeleteFileActionTest.py
+ create mode 100644 tests/general/actions/__init__.py
+
+diff --git a/bears/general/actions/DeleteFileAction.py b/bears/general/actions/DeleteFileAction.py
+new file mode 100644
+index 000000000..884bbcb43
+--- /dev/null
++++ b/bears/general/actions/DeleteFileAction.py
+@@ -0,0 +1,26 @@
++import os
++from coalib.results.result_actions.ResultAction import ResultAction
++
++
++class DeleteFileAction(ResultAction):
++    """
++    Deletes a file
++    """
++
++    SUCCESS_MESSAGE = 'File deleted successfully.'
++
++    def __init__(self, filename):
++        self.filename = filename
++        self.description = ('Delete {} [Note: This will '
++                            'delete the file permanently]').format(filename)
++
++    @staticmethod
++    def is_applicable(result,
++                      original_file_dict,
++                      file_diff_dict,
++                      applied_actions=()):
++        return 'DeleteFileAction' not in applied_actions
++
++    def apply(self, result, original_file_dict, file_diff_dict):
++        os.remove(self.filename)
++        return file_diff_dict
+diff --git a/bears/general/actions/__init__.py b/bears/general/actions/__init__.py
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/tests/general/actions/DeleteFileActionTest.py b/tests/general/actions/DeleteFileActionTest.py
+new file mode 100644
+index 000000000..1fbbcb334
+--- /dev/null
++++ b/tests/general/actions/DeleteFileActionTest.py
+@@ -0,0 +1,35 @@
++import os
++import unittest
++from unittest.mock import patch
++from coalib.results.Result import Result
++from bears.general.actions.DeleteFileAction import DeleteFileAction
++from coala_utils.ContextManagers import retrieve_stdout
++
++
++def get_path(file):
++    return os.path.join(
++        os.getcwd(), 'tests', 'general', 'duplicate_test_files', file)
++
++
++class DeleteFileActionTest(unittest.TestCase):
++
++    def setUp(self):
++        self.file1 = 'complexFirst.txt'
++        self.file2 = 'complexSecond.txt'
++        self.result = Result('origin', 'message')
++        self.uut1 = DeleteFileAction(self.file1)
++        self.uut2 = DeleteFileAction(self.file2)
++
++    def test_is_applicable(self):
++        self.assertTrue(self.uut1.is_applicable(self.result, {}, {}))
++        self.assertFalse(self.uut1.is_applicable(
++            self.result, {}, {}, applied_actions=('DeleteFileAction')))
++
++    def test_apply(self):
++        with retrieve_stdout() as stdout:
++            patcher = ('bears.general.actions.DeleteFileAction.'
++                       'os.remove')
++            with patch(patcher):
++                ret = self.uut1.apply(self.result, {}, {'file': 'diff'})
++                self.assertEqual(ret, {'file': 'diff'})
++                self.assertEqual(stdout.getvalue(), '')
+diff --git a/tests/general/actions/__init__.py b/tests/general/actions/__init__.py
+new file mode 100644
+index 000000000..e69de29bb

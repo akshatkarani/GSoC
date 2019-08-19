@@ -1,0 +1,30 @@
+From 7f9ee195987d3b7c9bf8f3a3ce1cc54691b71d3b Mon Sep 17 00:00:00 2001
+From: akshatkarani <akshatkarani@gmail.com>
+Date: Mon, 19 Aug 2019 20:09:41 +0530
+Subject: [PATCH] Writing_Native_Bears: Explain multiple patches
+
+This updates Writing_Native_Bears.rst to explain how bears can suggest
+multiple patches.
+---
+ docs/Developers/Writing_Native_Bears.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/docs/Developers/Writing_Native_Bears.rst b/docs/Developers/Writing_Native_Bears.rst
+index 45e05eaac..ebcbf6dfc 100644
+--- a/docs/Developers/Writing_Native_Bears.rst
++++ b/docs/Developers/Writing_Native_Bears.rst
+@@ -297,6 +297,14 @@ constructor, so you can e.g. create a result that proposes a code change
+ to the user. If the user likes it, coala will apply it automatically -
+ you don't need to care.
+ 
++To propose a change Result class has a ``diffs`` parameter which accepts a
++dictionary with key as a filename and value as a Diff object which is
++basically the proposed changes in that file.
++Bears also have the ability to suggest multiple changes for a single problem
++and let user decide which change to make. For this along with ``diffs``
++Result class also has an ``alternate_diffs`` parameter which accepts
++a list of dictionaries where each element is an alternate change.
++
+ Your function needs to return an iterable of ``Result`` objects: that
+ means you can either return a ``list`` of ``Result`` objects or simply
+ yield them and write the method as a generator.

@@ -1,0 +1,745 @@
+From b3901edd9b20c86dbfbe9caa5b701eb840529195 Mon Sep 17 00:00:00 2001
+From: akshatkarani <akshatkarani@gmail.com>
+Date: Mon, 5 Aug 2019 19:45:58 +0530
+Subject: [PATCH] Result.py: Add actions attribute
+
+This adds support for bears to define their own custom actions. A new
+`actions` attribute is added to Result class. It is a list of action
+objects defined by the bears.
+This also adds a new attribute `identity` to `get_metadata` function is
+ResultAction module. This is used as a key for `action_dict`.
+Also made changes in ConsoleInteraction and Processing module to add
+actions to list of default actions.
+---
+ coalib/output/ConsoleInteraction.py           | 46 ++++-----
+ coalib/processes/Processing.py                | 81 ++++++++-------
+ coalib/results/Result.py                      | 14 ++-
+ coalib/results/result_actions/ResultAction.py | 10 +-
+ tests/output/ConsoleInteractionTest.py        | 80 ++++++++++++---
+ tests/processes/ProcessingTest.py             | 98 +++++++++++++++++--
+ .../result_actions/ResultActionTest.py        |  6 ++
+ 7 files changed, 246 insertions(+), 89 deletions(-)
+
+diff --git a/coalib/output/ConsoleInteraction.py b/coalib/output/ConsoleInteraction.py
+index 3bf1a7400..34bc88974 100644
+--- a/coalib/output/ConsoleInteraction.py
++++ b/coalib/output/ConsoleInteraction.py
+@@ -173,13 +173,13 @@ def acquire_actions_and_apply(console_printer,
+         action_dict = {}
+         metadata_list = []
+ 
+-        for action in cli_actions:
++        for action in list(cli_actions) + result.actions:
+             if action.is_applicable(result,
+                                     file_dict,
+                                     file_diff_dict,
+                                     tuple(applied_actions.keys())) is True:
+                 metadata = action.get_metadata()
+-                action_dict[metadata.name] = action
++                action_dict[metadata.id] = action
+                 metadata_list.append(metadata)
+ 
+         if not metadata_list:
+@@ -640,12 +640,13 @@ def choose_action(console_printer, actions, apply_single=False):
+                             with the description of the actions.
+     """
+     actions_desc = []
+-    actions_name = []
++    actions_id = []
++    do_nothing_action = actions[0]
+     if apply_single:
+         for i, action in enumerate(actions, 0):
+             if apply_single == action.desc:
+-                return ([action.desc], [action.name])
+-        return (['Do (N)othing'], ['Do (N)othing'])
++                return ([action.desc], [action.id])
++        return ([do_nothing_action.desc], [do_nothing_action.id])
+     else:
+         while True:
+             for i, action in enumerate(actions, 0):
+@@ -667,7 +668,7 @@ def choose_action(console_printer, actions, apply_single=False):
+                         c = int(c)
+                         if i == c:
+                             actions_desc.append(action.desc)
+-                            actions_name.append(action.name)
++                            actions_id.append(action.id)
+                             break
+                 elif c.isalpha():
+                     c = c.upper()
+@@ -675,16 +676,16 @@ def choose_action(console_printer, actions, apply_single=False):
+                     for i, action in enumerate(actions, 1):
+                         if c in action.desc:
+                             actions_desc.append(action.desc)
+-                            actions_name.append(action.name)
++                            actions_id.append(action.id)
+                             break
+                 if actions_desc_len == len(actions_desc):
+                     console_printer.print(STR_INVALID_OPTION.format(str_c),
+                                           color=WARNING_COLOR)
+ 
+             if not choice:
+-                actions_desc.append(DoNothingAction().get_metadata().desc)
+-                actions_name.append(DoNothingAction().get_metadata().name)
+-            return (actions_desc, actions_name)
++                actions_desc.append(do_nothing_action.desc)
++                actions_id.append(do_nothing_action.id)
++            return (actions_desc, actions_id)
+ 
+ 
+ def try_to_apply_action(action_name,
+@@ -729,10 +730,10 @@ def try_to_apply_action(action_name,
+             console_printer.print(
+                 format_lines(chosen_action.SUCCESS_MESSAGE, symbol='['),
+                 color=SUCCESS_COLOR)
+-        applied_actions[action_name] = [copy.copy(result), copy.copy(
+-            file_dict),
+-                                    copy.copy(file_diff_dict),
+-                                    copy.copy(section)]
++        applied_actions[action_name] = [copy.copy(result),
++                                        copy.copy(file_dict),
++                                        copy.copy(file_diff_dict),
++                                        copy.copy(section)]
+         result.set_applied_actions(applied_actions)
+         failed_actions.discard(action_name)
+     except Exception as exception:  # pylint: disable=broad-except
+@@ -779,17 +780,17 @@ def ask_for_action_and_apply(console_printer,
+     """
+     do_nothing_action = DoNothingAction()
+     metadata_list.insert(0, do_nothing_action.get_metadata())
+-    action_dict[do_nothing_action.get_metadata().name] = DoNothingAction()
++    action_dict[do_nothing_action.get_metadata().id] = DoNothingAction()
+ 
+-    actions_desc, actions_name = choose_action(console_printer, metadata_list,
+-                                               apply_single)
++    actions_desc, actions_id = choose_action(console_printer, metadata_list,
++                                             apply_single)
+ 
+     if apply_single:
+         for index, action_details in enumerate(metadata_list, 1):
+             if apply_single == action_details.desc:
+                 action_name, section = get_action_info(
+                     section, metadata_list[index - 1], failed_actions)
+-                chosen_action = action_dict[action_details.name]
++                chosen_action = action_dict[action_details.id]
+                 try_to_apply_action(action_name,
+                                     chosen_action,
+                                     console_printer,
+@@ -801,14 +802,15 @@ def ask_for_action_and_apply(console_printer,
+                                     file_diff_dict,
+                                     file_dict,
+                                     applied_actions)
++                break
+         return False
+     else:
+-        for action_choice, action_choice_name in zip(actions_desc,
+-                                                     actions_name):
+-            chosen_action = action_dict[action_choice_name]
++        for action_choice, action_choice_id in zip(actions_desc,
++                                                   actions_id):
++            chosen_action = action_dict[action_choice_id]
+             action_choice_made = action_choice
+             for index, action_details in enumerate(metadata_list, 1):
+-                if action_choice_made in action_details.desc:
++                if action_choice_made == action_details.desc:
+                     action_name, section = get_action_info(
+                         section, metadata_list[index-1], failed_actions)
+                     try_to_apply_action(action_name,
+diff --git a/coalib/processes/Processing.py b/coalib/processes/Processing.py
+index ee2b44fba..f463ae6a5 100644
+--- a/coalib/processes/Processing.py
++++ b/coalib/processes/Processing.py
+@@ -32,13 +32,13 @@
+ from coalib.io.File import File
+ 
+ 
+-ACTIONS = [DoNothingAction,
+-           ApplyPatchAction,
+-           PrintDebugMessageAction,
+-           ShowPatchAction,
+-           IgnoreResultAction,
+-           ShowAppliedPatchesAction,
+-           GeneratePatchesAction]
++ACTIONS = [DoNothingAction(),
++           ApplyPatchAction(),
++           PrintDebugMessageAction(),
++           ShowPatchAction(),
++           IgnoreResultAction(),
++           ShowAppliedPatchesAction(),
++           GeneratePatchesAction()]
+ 
+ 
+ def get_cpu_count():
+@@ -74,21 +74,23 @@ def create_process_group(command_array, **kwargs):
+     return proc
+ 
+ 
+-def get_default_actions(section):
++def get_default_actions(section, bear_actions):
+     """
+     Parses the key ``default_actions`` in the given section.
+ 
+-    :param section:    The section where to parse from.
+-    :return:           A dict with the bearname as keys and their default
+-                       actions as values and another dict that contains bears
+-                       and invalid action names.
++    :param section:      The section where to parse from.
++    :param bear_actions: List of all the bear defined actions.
++    :return:             A dict with the bearname as keys and their default
++                         actions as values and another dict that contains bears
++                         and invalid action names.
+     """
+     try:
+         default_actions = dict(section['default_actions'])
+     except IndexError:
+         return {}, {}
+ 
+-    action_dict = {action.get_metadata().name: action for action in ACTIONS}
++    action_dict = {action.get_metadata().name: action
++                   for action in ACTIONS + bear_actions}
+     invalid_action_set = default_actions.values() - action_dict.keys()
+     invalid_actions = {}
+     if len(invalid_action_set) != 0:
+@@ -121,8 +123,11 @@ def autoapply_actions(results,
+     :param log_printer:    A log printer instance to log messages on.
+     :return:               A list of unprocessed results.
+     """
+-
+-    default_actions, invalid_actions = get_default_actions(section)
++    bear_actions = []
++    for result in results:
++        bear_actions += result.actions
++    default_actions, invalid_actions = get_default_actions(section,
++                                                           bear_actions)
+     no_autoapply_warn = bool(section.get('no_autoapply_warn', False))
+     for bearname, actionname in invalid_actions.items():
+         logging.warning('Selected default action {!r} for bear {!r} does not '
+@@ -145,30 +150,32 @@ def autoapply_actions(results,
+             else:
+                 not_processed_results.append(result)
+                 continue
++        if action not in bear_actions or action in result.actions:
++            applicable = action.is_applicable(result, file_dict, file_diff_dict)
++            if applicable is not True:
++                if not no_autoapply_warn:
++                    logging.warning('{}: {}'.format(result.origin, applicable))
++                not_processed_results.append(result)
++                continue
+ 
+-        applicable = action.is_applicable(result, file_dict, file_diff_dict)
+-        if applicable is not True:
+-            if not no_autoapply_warn:
+-                logging.warning('{}: {}'.format(result.origin, applicable))
+-            not_processed_results.append(result)
+-            continue
+-
+-        try:
+-            action().apply_from_section(result,
+-                                        file_dict,
+-                                        file_diff_dict,
+-                                        section)
+-            logging.info('Applied {!r} on {} from {!r}.'.format(
+-                action.get_metadata().name,
+-                result.location_repr(),
+-                result.origin))
+-        except Exception as ex:
++            try:
++                action.apply_from_section(result,
++                                          file_dict,
++                                          file_diff_dict,
++                                          section)
++                logging.info('Applied {!r} on {} from {!r}.'.format(
++                    action.get_metadata().name,
++                    result.location_repr(),
++                    result.origin))
++            except Exception as ex:
++                not_processed_results.append(result)
++                log_exception(
++                    'Failed to execute action {!r} with error: {}.'.format(
++                        action.get_metadata().name, ex),
++                    ex)
++                logging.debug('-> for result ' + repr(result) + '.')
++        else:
+             not_processed_results.append(result)
+-            log_exception(
+-                'Failed to execute action {!r} with error: {}.'.format(
+-                    action.get_metadata().name, ex),
+-                ex)
+-            logging.debug('-> for result ' + repr(result) + '.')
+ 
+     return not_processed_results
+ 
+diff --git a/coalib/results/Result.py b/coalib/results/Result.py
+index 30f5d94cc..1028d844b 100644
+--- a/coalib/results/Result.py
++++ b/coalib/results/Result.py
+@@ -65,7 +65,8 @@ def __init__(self,
+                  confidence: int = 100,
+                  aspect: (aspectbase, None) = None,
+                  message_arguments: dict = {},
+-                 applied_actions: dict = {}):
++                 applied_actions: dict = {},
++                 actions: list = []):
+         """
+         :param origin:
+             Class name or creator object of this object.
+@@ -99,6 +100,8 @@ def __init__(self,
+         :param applied_actions:
+             A dictionary that contains the result, file_dict, file_diff_dict and
+             the section for an action.
++        :param actions:
++            A list of action instances specific to the origin of the result.
+         :raises ValueError:
+             Raised when confidence is not between 0 and 100.
+         :raises KeyError:
+@@ -131,6 +134,7 @@ def __init__(self,
+         if self.aspect and not self.additional_info:
+             self.additional_info = '{} {}'.format(
+                 aspect.Docs.importance_reason, aspect.Docs.fix_suggestions)
++        self.actions = actions
+ 
+     @property
+     def message(self):
+@@ -164,7 +168,8 @@ def from_values(cls,
+                     diffs: (dict, None) = None,
+                     confidence: int = 100,
+                     aspect: (aspectbase, None) = None,
+-                    message_arguments: dict = {}):
++                    message_arguments: dict = {},
++                    actions: list = []):
+         """
+         Creates a result with only one SourceRange with the given start and end
+         locations.
+@@ -209,6 +214,8 @@ def from_values(cls,
+             should be a leaf of the aspect tree! (If you have a node, spend
+             some time figuring out which of the leafs exactly your result
+             belongs to.)
++        :param actions:
++            A list of action instances specific to the origin of the result.
+         """
+         source_range = SourceRange.from_values(file,
+                                                line,
+@@ -225,7 +232,8 @@ def from_values(cls,
+                    diffs=diffs,
+                    confidence=confidence,
+                    aspect=aspect,
+-                   message_arguments=message_arguments)
++                   message_arguments=message_arguments,
++                   actions=actions)
+ 
+     def to_string_dict(self):
+         """
+diff --git a/coalib/results/result_actions/ResultAction.py b/coalib/results/result_actions/ResultAction.py
+index c6ff19e0a..7bfbb8c8a 100644
+--- a/coalib/results/result_actions/ResultAction.py
++++ b/coalib/results/result_actions/ResultAction.py
+@@ -69,8 +69,7 @@ def apply_from_section(self,
+         params = self.get_metadata().create_params_from_section(section)
+         return self.apply(result, original_file_dict, file_diff_dict, **params)
+ 
+-    @classmethod
+-    def get_metadata(cls):
++    def get_metadata(self):
+         """
+         Retrieves metadata for the apply function. The description may be used
+         to advertise this action to the user. The parameters and their help
+@@ -81,8 +80,11 @@ def get_metadata(cls):
+         :return: A FunctionMetadata object.
+         """
+         data = FunctionMetadata.from_function(
+-            cls.apply,
++            self.apply,
+             omit={'self', 'result', 'original_file_dict', 'file_diff_dict'})
+-        data.name = cls.__name__
++        if hasattr(self, 'description'):
++            data.desc = self.description
++        data.name = self.__class__.__name__
++        data.id = id(self)
+ 
+         return data
+diff --git a/tests/output/ConsoleInteractionTest.py b/tests/output/ConsoleInteractionTest.py
+index 2ff1290b3..ab1a42208 100644
+--- a/tests/output/ConsoleInteractionTest.py
++++ b/tests/output/ConsoleInteractionTest.py
+@@ -69,6 +69,15 @@ def apply(self, result, original_file_dict, file_diff_dict, param):
+         """
+ 
+ 
++class BearAction(ResultAction):
++
++    def apply(self, result, original_file_dict, file_diff_dict):
++        """
++        (B)ear Action
++        """
++        return file_diff_dict
++
++
+ class TestBear(Bear):
+ 
+     CAN_DETECT = {'Formatting'}
+@@ -387,7 +396,8 @@ def test_acquire_actions_and_apply(self):
+                                               self.file_diff_dict,
+                                               Result(
+                                                   'origin', 'message',
+-                                                  diffs={testfile_path: diff}),
++                                                  diffs={testfile_path: diff},
++                                                  actions=[BearAction()]),
+                                               file_dict)
+                     self.assertEqual(generator.last_input, 1)
+                     self.assertIn(ApplyPatchAction.SUCCESS_MESSAGE,
+@@ -412,7 +422,8 @@ def apply(*args, **kwargs):
+                                               self.file_diff_dict,
+                                               Result(
+                                                   'origin', 'message',
+-                                                  diffs={testfile_path: diff}),
++                                                  diffs={testfile_path: diff},
++                                                  actions=[BearAction()]),
+                                               file_dict,
+                                               cli_actions=cli_actions)
+                     self.assertEqual(generator.last_input, 2)
+@@ -440,7 +451,8 @@ def test_acquire_actions_and_apply_single(self):
+                                               self.file_diff_dict,
+                                               Result(
+                                                   'origin', 'message',
+-                                                  diffs={testfile_path: diff}),
++                                                  diffs={testfile_path: diff},
++                                                  actions=[BearAction()]),
+                                               file_dict, apply_single=True)
+                     self.assertEqual(generator.last_input, -1)
+                     self.assertIn('', sio.getvalue())
+@@ -464,7 +476,8 @@ def apply(*args, **kwargs):
+                                               self.file_diff_dict,
+                                               Result(
+                                                   'origin', 'message',
+-                                                  diffs={testfile_path: diff}),
++                                                  diffs={testfile_path: diff},
++                                                  actions=[BearAction()]),
+                                               file_dict,
+                                               cli_actions=cli_actions,
+                                               apply_single=True)
+@@ -478,13 +491,54 @@ def apply(*args, **kwargs):
+ 
+             ApplyPatchAction.is_applicable = old_applypatch_is_applicable
+ 
++    def test_acquire_action_and_apply_bear_actions(self):
++        with make_temp() as testfile_path:
++            file_dict = {testfile_path: ['1\n', '2\n', '3\n']}
++            diff = Diff(file_dict[testfile_path])
++            diff.delete_line(2)
++            diff.change_line(3, '3\n', '3_changed\n')
++            with simulate_console_inputs('b', 'n') as generator:
++                with retrieve_stdout() as sio:
++                    BearAction.is_applicable = lambda *args: True
++                    acquire_actions_and_apply(self.console_printer,
++                                              Section(''),
++                                              self.file_diff_dict,
++                                              Result(
++                                                  'origin', 'message',
++                                                  diffs={testfile_path: diff},
++                                                  actions=[BearAction()]),
++                                              file_dict)
++                    self.assertEqual(generator.last_input, 1)
++                    self.assertIn(BearAction.SUCCESS_MESSAGE,
++                                  sio.getvalue())
++
++            BearAction.is_applicable = (
++                lambda *args: 'BearAction cannot be applied')
++
++            with simulate_console_inputs('b', 'n') as generator:
++                with retrieve_stdout() as sio:
++                    acquire_actions_and_apply(self.console_printer,
++                                              Section(''),
++                                              self.file_diff_dict,
++                                              Result(
++                                                  'origin', 'message',
++                                                  diffs={testfile_path: diff},
++                                                  actions=[BearAction()]),
++                                              file_dict)
++
++                    action_fail = 'BearAction cannot be applied'
++                    self.assertNotIn(action_fail, sio.getvalue())
++
++                    apply_path_desc = ApplyPatchAction().get_metadata().desc
++                    self.assertEqual(sio.getvalue().count(apply_path_desc), 0)
++
+     def test_ask_for_actions_and_apply(self):
+         failed_actions = set()
+         action = TestAction()
+         do_nothing_action = DoNothingAction()
+         args = [self.console_printer, Section(''),
+                 [do_nothing_action.get_metadata(), action.get_metadata()],
+-                {'DoNothingAction': do_nothing_action, 'TestAction': action},
++                {id(do_nothing_action): do_nothing_action, id(action): action},
+                 failed_actions, Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs('a', 'param1', 'a', 'param2') as generator:
+@@ -502,7 +556,7 @@ def test_ask_for_actions_and_apply(self):
+         failed_actions = set()
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+-                [action.get_metadata()], {'TestAction': action},
++                [action.get_metadata()], {id(action): action},
+                 failed_actions, Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs('a', 'param1', 'a', 'param2') as generator:
+@@ -519,7 +573,7 @@ def test_ask_for_actions_and_apply(self):
+     def test_default_input(self):
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+-                [action.get_metadata()], {'TestAction': action},
++                [action.get_metadata()], {id(action): action},
+                 set(), Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs('') as generator:
+@@ -529,7 +583,7 @@ def test_default_input2(self):
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+                 [action.get_metadata()],
+-                {'TestAction': action},
++                {id(action): action},
+                 set(), Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs(1, 1) as generator:
+@@ -539,7 +593,7 @@ def test_default_input3(self):
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+                 [action.get_metadata()],
+-                {'TestAction': action},
++                {id(action): action},
+                 set(), Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs(1, 'a') as generator:
+@@ -548,7 +602,7 @@ def test_default_input3(self):
+     def test_default_input4(self):
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+-                [action.get_metadata()], {'TestAction': action},
++                [action.get_metadata()], {id(action): action},
+                 set(), Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs(5, 0) as generator:
+@@ -557,7 +611,7 @@ def test_default_input4(self):
+     def test_default_input_apply_single_nothing(self):
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+-                [action.get_metadata()], {'TestAction': action},
++                [action.get_metadata()], {id(action): action},
+                 set(), Result('origin', 'message'), {}, {}, {}]
+ 
+         with simulate_console_inputs(1, 'a') as generator:
+@@ -579,7 +633,7 @@ def test_default_input_apply_single_test(self):
+         se = Section('cli')
+         args = [self.console_printer, se,
+                 [do_nothing_action.get_metadata(), action.get_metadata()],
+-                {'DoNothingAction': do_nothing_action, 'TestAction': action},
++                {id(do_nothing_action): do_nothing_action, id(action): action},
+                 set(), Result('origin', 'message'), {}, {}, {}, apply_single]
+ 
+         with simulate_console_inputs('a') as generator:
+@@ -588,7 +642,7 @@ def test_default_input_apply_single_test(self):
+     def test_default_input_apply_single_fail(self):
+         action = TestAction()
+         args = [self.console_printer, Section(''),
+-                [action.get_metadata()], {'TestAction': action},
++                [action.get_metadata()], {id(action): action},
+                 set(), Result('origin', 'message'), {}, {}]
+ 
+         with simulate_console_inputs(5, 0) as generator:
+diff --git a/tests/processes/ProcessingTest.py b/tests/processes/ProcessingTest.py
+index d84dbab40..19c8b1174 100644
+--- a/tests/processes/ProcessingTest.py
++++ b/tests/processes/ProcessingTest.py
+@@ -633,24 +633,42 @@ def __init__(self, file_dict, section, queue, timeout=0.1):
+                               debug=True)
+ 
+ 
++class MyBearAction(ResultAction):
++
++    def apply(self, result, original_file_dict, file_diff_dict):
++        logging.debug('ACTION APPLIED SUCCESSFULLY.')
++
++
+ class ProcessingTest_GetDefaultActions(unittest.TestCase):
+ 
+     def setUp(self):
+         self.section = Section('X')
+ 
++        def equal(self, other):
++            return isinstance(self, other)
++
++        self.eq_apply_patch = ApplyPatchAction.__eq__
++        self.eq_print_debug_message = PrintDebugMessageAction.__eq__
++        ApplyPatchAction.__eq__ = equal
++        PrintDebugMessageAction.__eq__ = equal
++
++    def tearDown(self):
++        ApplyPatchAction.__eq__ = self.eq_apply_patch
++        PrintDebugMessageAction.__eq__ = self.eq_print_debug_message
++
+     def test_no_key(self):
+-        self.assertEqual(get_default_actions(self.section), ({}, {}))
++        self.assertEqual(get_default_actions(self.section, []), ({}, {}))
+ 
+     def test_no_value(self):
+         self.section.append(Setting('default_actions', ''))
+-        self.assertEqual(get_default_actions(self.section), ({}, {}))
++        self.assertEqual(get_default_actions(self.section, []), ({}, {}))
+ 
+     def test_only_valid_actions(self):
+         self.section.append(Setting(
+             'default_actions',
+             'MyBear: PrintDebugMessageAction, ValidBear: ApplyPatchAction'))
+         self.assertEqual(
+-            get_default_actions(self.section),
++            get_default_actions(self.section, []),
+             ({'MyBear': PrintDebugMessageAction,
+               'ValidBear': ApplyPatchAction},
+              {}))
+@@ -659,10 +677,19 @@ def test_valid_and_invalid_actions(self):
+         self.section.append(Setting(
+             'default_actions',
+             'MyBear: INVALID_action, ValidBear: ApplyPatchAction, XBear: ABC'))
+-        self.assertEqual(get_default_actions(self.section),
++        self.assertEqual(get_default_actions(self.section, []),
+                          ({'ValidBear': ApplyPatchAction},
+                           {'MyBear': 'INVALID_action', 'XBear': 'ABC'}))
+ 
++    def test_valid_bear_actions(self):
++        my_bear_action = MyBearAction()
++        self.section.append(Setting(
++            'default_actions',
++            'MyBear: MyBearAction, ValidBear: ApplyPatchAction'))
++        self.assertEqual(
++            get_default_actions(self.section, [my_bear_action]),
++            ({'MyBear': my_bear_action, 'ValidBear': ApplyPatchAction}, {}))
++
+ 
+ class ProcessingTest_AutoapplyActions(unittest.TestCase):
+ 
+@@ -670,9 +697,10 @@ def setUp(self):
+         self.log_queue = queue.Queue()
+         self.log_printer = ProcessingTestLogPrinter(self.log_queue)
+ 
++        self.resultX = Result('XBear', 'msg0', actions=[MyBearAction()])
+         self.resultY = Result('YBear', 'msg1')
+         self.resultZ = Result('ZBear', 'msg2')
+-        self.results = [self.resultY, self.resultZ]
++        self.results = [self.resultX, self.resultY, self.resultZ]
+         self.section = Section('A')
+ 
+     def test_no_default_actions(self):
+@@ -705,7 +733,7 @@ def test_without_default_action_and_unapplicable(self):
+         # Use a result where no default action is supplied for and another one
+         # where the action is not applicable.
+         old_is_applicable = ApplyPatchAction.is_applicable
+-        ApplyPatchAction.is_applicable = (
++        ApplyPatchAction.is_applicable = staticmethod(
+             lambda *args: 'The ApplyPatchAction cannot be applied'
+         )
+ 
+@@ -723,7 +751,7 @@ def test_without_default_action_and_unapplicable(self):
+             ('root', 'WARNING', 'YBear: The ApplyPatchAction cannot be applied')
+         )
+ 
+-        ApplyPatchAction.is_applicable = old_is_applicable
++        ApplyPatchAction.is_applicable = staticmethod(old_is_applicable)
+ 
+         self.section.append(Setting(
+             'no_autoapply_warn', True))
+@@ -744,7 +772,7 @@ class TestAction(ResultAction):
+             def apply(self, *args, **kwargs):
+                 logging.debug('ACTION APPLIED SUCCESSFULLY.')
+ 
+-        ACTIONS.append(TestAction)
++        ACTIONS.append(TestAction())
+ 
+         self.section.append(Setting('default_actions', 'Z*: TestAction'))
+         with LogCapture() as capture:
+@@ -753,7 +781,7 @@ def apply(self, *args, **kwargs):
+                                     {},
+                                     self.section,
+                                     log_printer)
+-        self.assertEqual(ret, [self.resultY])
++        self.assertEqual(ret, [self.resultX, self.resultY])
+         capture.check(
+             ('root', 'DEBUG', 'ACTION APPLIED SUCCESSFULLY.'),
+             ('root', 'INFO', "Applied 'TestAction' on the whole project from "
+@@ -761,13 +789,63 @@ def apply(self, *args, **kwargs):
+         )
+         ACTIONS.pop()
+ 
++    def test_bear_action_applicable(self):
++        MyBearAction.is_applicable = staticmethod(lambda *args: True)
++        log_printer = self.log_printer
++
++        self.section.append(Setting('default_actions', 'X*: MyBearAction'))
++        with LogCapture() as capture:
++            ret = autoapply_actions(self.results,
++                                    {},
++                                    {},
++                                    self.section,
++                                    log_printer)
++        self.assertEqual(ret, [self.resultY, self.resultZ])
++        capture.check(
++            ('root', 'DEBUG', 'ACTION APPLIED SUCCESSFULLY.'),
++            ('root', 'INFO', "Applied 'MyBearAction' on the whole project from "
++                             "'XBear'.")
++        )
++
++    def test_bear_action_unapplicable(self):
++        MyBearAction.is_applicable = staticmethod(
++            lambda *args: 'The MyBearAction cannot be applied'
++        )
++        log_printer = self.log_printer
++
++        self.section.append(Setting('default_actions', 'X*: MyBearAction'))
++        with LogCapture() as capture:
++            ret = autoapply_actions(self.results,
++                                    {},
++                                    {},
++                                    self.section,
++                                    log_printer)
++        self.assertEqual(ret, self.results)
++        capture.check(
++            ('root', 'WARNING', 'XBear: The MyBearAction cannot be applied')
++        )
++
++    def test_wrong_bear_origin(self):
++        MyBearAction.is_applicable = staticmethod(lambda *args: True)
++        log_printer = self.log_printer
++
++        self.section.append(Setting('default_actions', 'Y*: MyBearAction'))
++        with LogCapture() as capture:
++            ret = autoapply_actions(self.results,
++                                    {},
++                                    {},
++                                    self.section,
++                                    log_printer)
++        self.assertEqual(ret, self.results)
++        capture.check()
++
+     def test_failing_action(self):
+         class FailingTestAction(ResultAction):
+ 
+             def apply(self, *args, **kwargs):
+                 raise RuntimeError("YEAH THAT'S A FAILING BEAR")
+ 
+-        ACTIONS.append(FailingTestAction)
++        ACTIONS.append(FailingTestAction())
+ 
+         self.section.append(Setting('default_actions',
+                                     'YBear: FailingTestAction'))
+diff --git a/tests/results/result_actions/ResultActionTest.py b/tests/results/result_actions/ResultActionTest.py
+index 51aa7d8a0..4a5ac3dc3 100644
+--- a/tests/results/result_actions/ResultActionTest.py
++++ b/tests/results/result_actions/ResultActionTest.py
+@@ -36,4 +36,10 @@ def test_api(self):
+         self.assertEqual(len(uut.get_metadata().non_optional_params), 0)
+         self.assertEqual(len(uut.get_metadata().optional_params), 0)
+         self.assertEqual(uut.get_metadata().name, 'ResultAction')
++        self.assertEqual(uut.get_metadata().id, id(uut))
+         self.assertTrue(uut.is_applicable(result, None, None))
++
++        self.assertEqual(uut.get_metadata().desc,
++                         'No description. Something went wrong.')
++        uut.description = 'Test Action'
++        self.assertEqual(uut.get_metadata().desc, 'Test Action')

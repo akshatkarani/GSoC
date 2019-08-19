@@ -1,0 +1,26 @@
+From 993e86c80ee5fd290329bbe53ab11fa02e06eeb5 Mon Sep 17 00:00:00 2001
+From: akshatkarani <akshatkarani@gmail.com>
+Date: Fri, 9 Aug 2019 19:41:23 +0530
+Subject: [PATCH] DuplicateFileBear.py: Remove file argument
+
+This removes the file argument when result is yielded.
+
+Fixes https://github.com/coala/coala-bears/issues/2945
+---
+ bears/general/DuplicateFileBear.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/bears/general/DuplicateFileBear.py b/bears/general/DuplicateFileBear.py
+index 0bd460327..acf9221a8 100644
+--- a/bears/general/DuplicateFileBear.py
++++ b/bears/general/DuplicateFileBear.py
+@@ -33,6 +33,6 @@ def run(self):
+                     second_file_name = file_pair[1]
+                     message = ('File ' + first_file_name + ' is identical'
+                                ' to File ' + second_file_name)
+-                    yield Result.from_values(origin=self, message=message,
+-                                             severity=RESULT_SEVERITY.INFO,
+-                                             file=first_file_name)
++                    yield Result(origin=self,
++                                 message=message,
++                                 severity=RESULT_SEVERITY.INFO)
