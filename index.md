@@ -139,6 +139,6 @@ It was a great learning experience overall, and I did face a few problems throug
 
 ##### Work to be done
 
-Main advantage after this project is that now many useful custom actions can be implemented for bears. Identifying where custom actions can be useful and implementing them will be a .
+Main advantage after this project is that now many useful custom actions can be implemented for bears. Identifying where custom actions can be useful and implementing them will be a community driven process.
 Another thing which can be done is extending some of the existing bears to provide multiple patches.
-Also allowing actions to be initialized with custom descriptions would be really helpful.
+Also allowing actions to be initialized with custom descriptions would be really helpful because currently actions particularly AlternatePatchActions are displayed as `Show AlternatePatch` and a feature like above will display that actions specific descriptions which would be helpful to the user.
