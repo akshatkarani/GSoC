@@ -1,0 +1,94 @@
+From ac3c3b1ef611f233695778f6ca6674fa2d225e3c Mon Sep 17 00:00:00 2001
+From: akshatkarani <akshatkarani@gmail.com>
+Date: Tue, 25 Jun 2019 21:13:36 +0530
+Subject: [PATCH] ConsoleInteraction: Modify color_letter function
+
+This modifies color_letter function to run as correctly
+when there is a uppercase letter after the uppercase
+letter in parenthesis and also if action has a associated
+warning then it gets highlighted.
+
+Fixes https://github.com/coala/coala/issues/6034
+---
+ coalib/output/ConsoleInteraction.py    | 26 ++++++++++++++------------
+ tests/output/ConsoleInteractionTest.py | 19 ++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 13 deletions(-)
+
+diff --git a/coalib/output/ConsoleInteraction.py b/coalib/output/ConsoleInteraction.py
+index 3bf1a7400..1e0a25d26 100644
+--- a/coalib/output/ConsoleInteraction.py
++++ b/coalib/output/ConsoleInteraction.py
+@@ -97,22 +97,24 @@ def highlight_text(no_color, text, style, lexer=TextLexer()):
+ 
+ 
+ def color_letter(console_printer, line):
+-    x = -1
+-    y = -1
+-    letter = ''
+-    for i, l in enumerate(line, 0):
+-        if line[i] == '(':
+-            x = i
+-        if line[i] == ')':
+-            y = i
+-        if l.isupper() and x != -1:
+-            letter = l
++    x = line.find('(')
++    if x == -1:
++        letter = ''
++        y = x + 1
++    else:
++        letter = line[x + 1]
++        y = x + 2
++    warn = line.rfind('[')
++    if warn == 0:
++        warn = len(line)
+     first_part = line[:x+1]
+-    second_part = line[y:]
++    second_part = line[y:warn]
++    warning_part = line[warn:]
+ 
+     console_printer.print(first_part, end='')
+     console_printer.print(letter, color='blue', end='')
+-    console_printer.print(second_part)
++    console_printer.print(second_part, end='')
++    console_printer.print(warning_part, color='blue')
+ 
+ 
+ def format_lines(lines, symbol='', line_nr=''):
+diff --git a/tests/output/ConsoleInteractionTest.py b/tests/output/ConsoleInteractionTest.py
+index 2ff1290b3..c1e573eb1 100644
+--- a/tests/output/ConsoleInteractionTest.py
++++ b/tests/output/ConsoleInteractionTest.py
+@@ -22,7 +22,8 @@
+     show_language_bears_capabilities)
+ from coalib.output.ConsoleInteraction import (BackgroundSourceRangeStyle,
+                                               BackgroundMessageStyle,
+-                                              highlight_text)
++                                              highlight_text,
++                                              color_letter)
+ from coalib.output.printers.ListLogPrinter import ListLogPrinter
+ from coalib.parsing.DefaultArgParser import default_arg_parser
+ from coalib.results.Diff import Diff
+@@ -189,6 +190,22 @@ def tearDown(self):
+         OpenEditorAction.is_applicable = self.old_open_editor_applicable
+         ApplyPatchAction.is_applicable = self.old_apply_patch_applicable
+ 
++    def test_color_letter(self):
++        line1 = '[  ] 1. (A)pply Patch'
++        with retrieve_stdout() as stdout:
++            color_letter(self.console_printer, line1)
++            self.assertEqual(line1 + '\n', stdout.getvalue())
++
++        line2 = '[  ] *0. Apply (P)atch'
++        with retrieve_stdout() as stdout:
++            color_letter(self.console_printer, line2)
++            self.assertEqual(line2 + '\n', stdout.getvalue())
++
++        line3 = '[  ] 3. Apply (P)atch [Note: This will do something]'
++        with retrieve_stdout() as stdout:
++            color_letter(self.console_printer, line3)
++            self.assertEqual(line3 + '\n', stdout.getvalue())
++
+     def test_require_settings(self):
+         curr_section = Section('')
+         self.assertRaises(TypeError, acquire_settings,

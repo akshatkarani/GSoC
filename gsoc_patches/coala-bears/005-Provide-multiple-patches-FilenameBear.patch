@@ -1,0 +1,109 @@
+From 1410d617120cb2943f72dc162b579665dd45b9cf Mon Sep 17 00:00:00 2001
+From: akshatkarani <akshatkarani@gmail.com>
+Date: Tue, 13 Aug 2019 17:51:23 +0530
+Subject: [PATCH] FilenameBear.py: Provide multiple patches
+
+This will provide multiple patches to the user when the file
+naming convention cannot be guessed.
+---
+ bears/general/FilenameBear.py     | 20 ++++++++++++++++++++
+ tests/general/FilenameBearTest.py | 24 ++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/bears/general/FilenameBear.py b/bears/general/FilenameBear.py
+index 45461e984..00b3de6f2 100644
+--- a/bears/general/FilenameBear.py
++++ b/bears/general/FilenameBear.py
+@@ -58,6 +58,7 @@ def run(self, filename, file,
+         """
+         head, tail = os.path.split(filename)
+         filename_without_extension, extension = os.path.splitext(tail)
++        alternate_conventions = []
+ 
+         if file_naming_convention is None:
+             self.warn('Please specify a file naming convention explicitly'
+@@ -74,12 +75,20 @@ def run(self, filename, file,
+                 self.warn('The file naming convention could not be guessed. '
+                           'Using the default "snake" naming convention.')
+                 file_naming_convention = 'snake'
++                alternate_conventions += ['camel', 'kebab', 'pascal', 'space']
+ 
+         messages = []
+ 
+         try:
+             new_name = self._naming_convention[file_naming_convention](
+                 filename_without_extension)
++            alternate_names = [self._naming_convention[alternate_convention](
++                               filename_without_extension)
++                               for alternate_convention in
++                               alternate_conventions]
++            alternate_names = [alternate_name
++                               for alternate_name in alternate_names
++                               if alternate_name != filename_without_extension]
+         except KeyError:
+             self.err('Invalid file-naming-convention provided: ' +
+                      file_naming_convention)
+@@ -92,12 +101,16 @@ def run(self, filename, file,
+ 
+         if not filename_without_extension.startswith(filename_prefix):
+             new_name = filename_prefix + new_name
++            alternate_names = [filename_prefix + alternate_name
++                               for alternate_name in alternate_names]
+             messages.append(
+                 'Filename does not use the prefix {!r}.'.format(
+                     filename_prefix))
+ 
+         if not filename_without_extension.endswith(filename_suffix):
+             new_name = new_name + filename_suffix
++            alternate_names = [alternate_name + filename_suffix
++                               for alternate_name in alternate_names]
+             messages.append(
+                 'Filename does not use the suffix {!r}.'.format(
+                     filename_suffix))
+@@ -121,4 +134,11 @@ def run(self, filename, file,
+                             rename=os.path.join(head, new_name + extension))
+                 result_kwargs['diffs'] = {filename: diff}
+ 
++                if alternate_names:
++                    alternate_diffs = [{filename: Diff(
++                        file, rename=os.path.join(
++                            head, alternate_name + extension))}
++                                       for alternate_name in alternate_names]
++                    result_kwargs['alternate_diffs'] = alternate_diffs
++
+             yield Result.from_values(self, **result_kwargs)
+diff --git a/tests/general/FilenameBearTest.py b/tests/general/FilenameBearTest.py
+index 4cad11a09..077d543a8 100644
+--- a/tests/general/FilenameBearTest.py
++++ b/tests/general/FilenameBearTest.py
+@@ -110,6 +110,30 @@ def test_auto_file_naming_convention_warning(self):
+                          'The file naming convention could not be guessed. '
+                          'Using the default "snake" naming convention.')
+ 
++    def test_multiple_patches(self):
++        self.section['file_naming_convention'] = 'auto'
++
++        filename_test1 = 'FileName.xyz'
++        msg = 'Filename does not follow snake naming-convention.'
++        expected_diffs = {filename_test1: Diff(['\n'], rename='file_name.xyz')}
++
++        alternate_diffs = [{filename_test1: Diff(
++                                ['\n'], rename='fileName.xyz')},
++                           {filename_test1: Diff(
++                                ['\n'], rename='file-name.xyz')},
++                           {filename_test1: Diff(
++                                ['\n'], rename='File Name.xyz')}]
++
++        expected_result = Result.from_values('FilenameBear',
++                                             msg,
++                                             severity=RESULT_SEVERITY.NORMAL,
++                                             file=filename_test1,
++                                             diffs=expected_diffs,
++                                             alternate_diffs=alternate_diffs)
++
++        self.check_results(
++            self.uut, [''], [expected_result], filename=filename_test1)
++
+     def test_file_prefix(self):
+         self.section['filename_prefix'] = 'pre'
+         self.check_invalidity(
